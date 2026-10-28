@@ -124,7 +124,7 @@ ADMIN_USER_ID=your_id_here
 
 Mention the bot in your server:
 ```text
-@yourbot fetch https://en.wikipedia.org/wiki/T-62
+@yourbot how to make a chocolate cupcake
 ```
 Sit back, grab a coffee, watch Discord's typing indicator pulse for 90 seconds, and marvel at the technological achievement of our generation.
 
