@@ -1,213 +1,142 @@
-# Discord Multi-Provider LLM Bot with Model Context Protocol (MCP)
+# 🗑️ disslop
 
-An asynchronous Discord bot in Python with offline-tested security controls and full MCP tool integration:
-1. **Unified Multi-Provider LLM Engine (LiteLLM)**: Single unified agentic loop supporting OpenAI, Anthropic, Google Gemini, Vertex AI, AWS Bedrock, Ollama, OpenRouter, DeepSeek, Groq, xAI, and custom OpenAI/Anthropic-compatible proxies (Logflare, NVIDIA NIM, SenseNova, ShareLLM).
-2. **Model Context Protocol (MCP) Integration**: Connect to local (`stdio`), remote (`sse`), and modern `streamable_http` MCP servers on the fly, expose their tools to the active LLM, and execute multi-step agentic tool loops inside Discord.
-3. **Reasoning Standardization & DSML Interception**: Extracts chain-of-thought thinking blocks normalized across providers (`reasoning_content`, Anthropic `thinking` blocks, Gemini thoughts). Intercepts and executes DeepSeek Markup Language (`< | DSML | tool_calls>`) emitted by reasoning models and sanitizes raw XML from user replies.
-4. **Default-Deny Tool Security**: MCP tools require an explicit tool allowlist (`allowed_tools` supporting server names, wildcards, and exact tool names). Non-admin users receive conversational chat unless explicitly allowed by policy.
-5. **Subprocess & Credential Isolation**: Child MCP processes receive a clean OS execution environment without inheriting sensitive `.env` secrets (`DISCORD_BOT_TOKEN`, provider keys). Public Discord error messages redact secrets (including URL query parameter keys) and output generic correlation IDs (`[ErrorRef:xxxxxxxxxx]`).
-6. **Multi-Admin Support**: Supports multiple Discord administrators configured via `.env` (`ADMIN_USER_ID=id1, id2`).
-7. **Admission Control & Generous Research Limits**: Monotonic per-user cooldowns, concurrency limits, 10 agentic iterations per request, up to 20 tool calls, 128,000 characters per tool result, 250,000 characters total turn budget, and a 180-second generation deadline.
-8. **Mention Suppression**: All Discord bot messages and replies enforce `AllowedMentions.none()` to prevent ping spam or notification abuse.
+> **The world's most over-engineered pipeline for high-velocity, artisanal Discord slop.**
+
+[![Slop Quality: 100% Free-Range](https://img.shields.io/badge/Slop%20Quality-100%25%20Organic-orange.svg)](#)
+[![Status: 500 Internal Server Error](https://img.shields.io/badge/Status-500%20Internal%20Error%20(Feature)-red.svg)](#)
+[![Python: 3.14 (Why Run Stable?)](https://img.shields.io/badge/Python-3.14.10%20(Bleeding%20Edge)-blue.svg)](#)
+[![Tests: 100/100 Over-Engineered](https://img.shields.io/badge/Tests-100%2F100%20Green-brightgreen.svg)](#)
+[![Architecture: Extreme Modular Overkill](https://img.shields.io/badge/Architecture-Cogs%20%2B%20Subsystems-purple.svg)](#)
 
 ---
 
-## 📁 System Architecture
+## 🧐 What is `disslop`?
+
+Have you ever looked at a quiet, peaceful Discord server and thought:
+
+> *"What this chat really needs is a 26-billion-parameter open-weights model reading a 128,000-character Wikipedia article about Soviet tank transmissions for 92 seconds before crashing with a `500 Internal Server Error`?"*
+
+Look no further. **`disslop`** turns what could have been a 15-line `discord.py` bot into an enterprise-grade, asynchronous Model Context Protocol (MCP) orchestrator designed to pump unadulterated AI slop directly into your `#general` channel.
+
+Why write a simple bot when you can build a **multi-process subprocess sandbox with monotonic cooldown algorithms, LiteLLM unified dispatch, and 100 unit tests** just to deliver three paragraphs of hallucinated text?
+
+---
+
+## ✨ Groundbreaking Features
+
+* **Artisanal 91.66-Second Suspense Engine**:
+  Will it answer? Will it time out? Will the upstream provider melt down? Every `@mention` is an exhilarating, high-stakes game of Russian roulette!
+* **DeepSeek Markup Language (DSML) Scrubbing**:
+  When your budget model gets overwhelmed and starts vomiting raw `< | DSML | tool_calls>` and naked XML tags directly into its answer, our regex sanitizers catch it mid-air so your friends think the robot is actually competent.
+* **Format-Aware Tool Result Compaction**:
+  Fetches two Wikipedia articles totaling 250,000 characters, chops them into Head/Middle/Tail samples with surgical precision, and feeds them into an LLM context window that was never meant to hold them.
+* **100% Contract-Tested Slop Delivery**:
+  Over **100 offline unit tests** ensuring that when your bot inevitably drops a generic reference card (`❌ Error: AI Provider returned an API error. (Reference ID: 1099a13ed2)`), not a single byte of your API key is leaked to the peasants.
+* **Extreme Modular Overkill**:
+  Decomposed into Discord.py Cogs (`cogs/providers.py`, `cogs/mcp.py`, `cogs/chat.py`), decoupled state stores (`modules/state.py`), and subprocess isolation suites. Because God forbid any file have more than 200 lines.
+* **Monotonic Admission Limiter**:
+  Strictly regulates how often users can request slop, ensuring everyone waits their fair 10-second turn before receiving another 1,950-character block of AI prose.
+
+---
+
+## 🏗️ The Cathedral of Slop (Architecture)
 
 ```text
-discord-llm-bot/
-├── .env                  # Bootstrap secrets (Discord Token, Admin Discord IDs, optional seed keys)
-├── .env.example          # Setup template
-├── .gitignore            # Protects .env, runtime_config.json, and .venv/
-├── requirements.txt      # Direct runtime dependencies
-├── requirements.lock     # Authoritative pinned dependency lockfile
-├── runtime_config.json   # Persistent transactional store for profiles and MCP servers
-├── config_manager.py     # Thread-safe transactional state manager with atomic writes
-├── tool_policy.py        # Default-deny authorization policy & request context
-├── mcp_manager.py        # Facade re-exporting modules.mcp and managing worker lifecycle
-├── llm_service.py        # Facade re-exporting modules.llm and running unified LiteLLM loop
-├── error_reporting.py    # Secret redaction (keys, query params), correlation IDs, URL checks
-├── request_limits.py     # Monotonic cooldowns, per-user limits, and admission control
-├── conversation.py       # Deterministic conversation history builder anchored before trigger
-├── modules/              # Subsystem logic packages
-│   ├── llm/              # DSML parser, reasoning token extractor, LiteLLM routing
-│   ├── mcp/              # Process isolation, tool naming, schema compression, presentation
-│   └── formatting.py     # Discord chunked reply splitting, mention suppression, argument parsing
-├── cogs/                 # Discord.py Cogs subsystem
-│   ├── base.py           # Shared base cog, admin authorization checks, autocompletes
-│   ├── providers.py      # /configure_provider, /switch_provider, /delete_provider, /set_prompt, /llm_status
-│   ├── mcp.py            # /add_mcp_stdio, /add_mcp_sse, /add_mcp_http, /remove_mcp, /mcp_tools
-│   └── chat.py           # @mention conversational listener, history context, and !sync prefix command
-├── main.py               # Lean application entry point and coordinator (~175 lines)
-├── bot.py                # Backward-compatible wrapper re-exporting main and bot
-├── run.bat / run.ps1     # Directory-anchored start scripts using .venv
-└── tests/                # Comprehensive offline regression test suite (100 tests across 17 files)
+disslop/
+├── cogs/
+│   ├── base.py           # Checks if you're worthy (admin) to summon slop
+│   ├── providers.py      # Switch between cheap slop, expensive slop, and free VIP slop
+│   ├── mcp.py            # Spawns background Node & Python children to scrape the web
+│   └── chat.py           # Listens for @mentions and types anxiously while the model stalls
+├── modules/
+│   ├── llm/              # Translates human queries into tokens and thoughts into excuses
+│   ├── mcp/              # Sanitizes 100k-character dumps so the bot doesn't explode
+│   ├── formatting.py     # Chops slop into Discord-safe 1,950-character chunks
+│   └── state.py          # Solves Python __main__ duality because imports are hard
+├── main.py               # The conductor orchestrating this entire circus (~175 lines)
+└── tests/                # 100 automated tests proving this slop is strictly certified
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Slop Setup
 
 ### 1. Requirements
-- Python 3.11+ (Python 3.14.10 tested and verified with `uv`)
-- Node.js (if running `npx`-based MCP servers) or `uv` / `python`
+* **Python 3.14+** (Because why run boring Python 3.11 when you can debug experimental bytecode?)
+* A Discord bot token from the [Developer Portal](https://discord.com/developers/applications) with **Message Content Intent** enabled.
+* An API key from whatever third-party proxy endpoint is currently not returning `502 Bad Gateway`.
 
-### 2. Discord Developer Portal Setup
-1. Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications).
-2. Under **Bot**:
-   - Copy your `DISCORD_BOT_TOKEN`.
-   - Enable **Message Content Intent** under *Privileged Gateway Intents*.
-3. Under **OAuth2 > URL Generator**:
-   - Scopes: Select `bot` **AND** `applications.commands`.
-   - Bot Permissions: Select `Send Messages`, `Read Messages/View Channels`, `Read Message History`.
-   - Copy the invite URL and authorize the bot for your Discord server.
+### 2. Spawn Your Virtual Isolation Chamber (`.venv`)
+Isolate this slop machine from your global Python environment before it decides to upgrade your entire operating system:
 
-### 3. Get Your Discord User ID (`ADMIN_USER_ID`)
-1. Enable **Developer Mode** in Discord (**User Settings > Advanced**).
-2. Right-click your name in Discord and choose **Copy User ID**.
-3. For multiple admins, separate IDs with commas or spaces: `ADMIN_USER_ID=123456789012345678, 234567890123456789`.
+```powershell
+# Step A: Conjure the virtual environment out of thin air
+python -m venv .venv
 
-### 4. Configure `.env`
-Ensure your `.env` contains:
-```env
-DISCORD_BOT_TOKEN=your_discord_bot_token_here
-ADMIN_USER_ID=your_discord_user_id_here
-DEFAULT_SYSTEM_PROMPT=You are a helpful, concise AI assistant inside a Discord server.
+# Step B: Enter the matrix
+# On Windows PowerShell:
+.\.venv\Scripts\Activate.ps1
+# (If PowerShell complains about execution policies: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass)
+
+# On Windows Command Prompt (cmd.exe):
+.\.venv\Scripts\activate.bat
+
+# On Linux / macOS (if you somehow escaped Windows):
+source .venv/bin/activate
+
+# Step C: Ingest the locked dependencies
+pip install -r requirements.lock
 ```
 
-### 5. Run the Bot
-The provided launcher scripts automatically anchor the working directory to the project root:
+*(Or if you are a speed demon with `uv`: `uv venv && uv pip install -r requirements.lock`)*
+
+### 3. Configure Your Secrets
+Copy `.env.example` to `.env`:
+```env
+DISCORD_BOT_TOKEN=your_token_here
+ADMIN_USER_ID=your_id_here
+```
+*(Don't worry, our redaction engine replaces your secrets with `***` faster than you can leak them).*
+
+### 4. Launch the Slop Machine
 ```powershell
-# Windows Batch
+# Windows
 .\run.bat
 
-# Windows PowerShell
+# Or via PowerShell
 .\run.ps1
-
-# Or directly with Python:
-.\.venv\Scripts\python.exe main.py
 ```
 
 ---
 
-## Tool Permissions & Policy
+## 🕹️ Slash Commands for Connoisseurs
 
-By default, tool execution requires an explicit allowlist. To permit tools for admins or non-admins, configure the `tool_policy` section in `runtime_config.json`:
-
-```json
-"tool_policy": {
-  "admin_only": false,
-  "allowed_users": [],
-  "allowed_channels": [],
-  "allowed_tools": ["wiki", "parallel", "context7", "fetch"]
-}
-```
-
-- `allowed_tools`: Supports server names (e.g. `"wiki"`, `"parallel"`), wildcards (`"*"` for all tools), or exact tool names (`"wiki__get_article"`).
-- `admin_only`: When `false`, users listed in `allowed_users` (or all users if empty) can use the tools listed in `allowed_tools` within `allowed_channels`.
-- Admin callers bypass user and channel restrictions but still obey `allowed_tools`.
+| Command | What It Actually Does |
+|---|---|
+| `/configure_provider` | Choose your preferred flavor of slop (OpenAI, Anthropic, Gemini, Ollama, or sketchy proxies). |
+| `/switch_provider` | Instantly jump to a profile that isn't throwing 500 errors right now. |
+| `/add_mcp_stdio` | Launch an unmonitored `npx` or `uvx` child process on your computer to crawl the web. |
+| `/mcp_tools` | View all the external weapons currently loaded into the bot's arsenal. |
+| `/set_prompt` | Teach the bot a new personality so its slop feels fresh and bespoke. |
+| `/llm_status` | Stare at your active token limit and calculate how much money you burned today. |
+| `!sync` | Screams at Discord's gateway until your slash commands finally show up. |
 
 ---
 
-## 🔌 Model Context Protocol (MCP) Slash Commands
+## 💡 How to Trigger Peak Slop
 
-All MCP configuration commands are restricted to bot administrators (`ADMIN_USER_ID`) and respond with `ephemeral=True`.
-
-### 1. Connect a Local MCP Server (`stdio`)
+Mention the bot in your server:
 ```text
-/add_mcp_stdio name:[str] command:[str] args:[str] env:[optional str]
+@walt fetch https://en.wikipedia.org/wiki/T-54/55 https://en.wikipedia.org/wiki/T-62
 ```
-- Automatically removes inadvertent `-y` flags if command is `uvx`.
-- **Wikipedia MCP:**
-  ```text
-  /add_mcp_stdio name:wiki command:uvx args:wikipedia-mcp
-  ```
-- **Fetch MCP:**
-  ```text
-  /add_mcp_stdio name:fetch command:uvx args:mcp-server-fetch
-  ```
-- **Context7 Docs MCP:**
-  ```text
-  /add_mcp_stdio name:context7 command:npx args:-y @upstash/context7-mcp --api-key ctx7sk-your-key
-  ```
-
-### 2. Connect a Remote Streamable HTTP MCP Server
-```text
-/add_mcp_http name:[str] url:[str] api_key:[optional str] headers:[optional str]
-```
-- Modern JSON-RPC over HTTP POST (e.g. Parallel.ai):
-  ```text
-  /add_mcp_http name:parallel url:https://mcp.parallel.ai/mcp headers:Authorization=Bearer your_key
-  ```
-
-### 3. Connect a Remote SSE MCP Server
-```text
-/add_mcp_sse name:[str] url:[str] api_key:[optional str] headers:[optional str]
-```
-- Automatically falls back to Streamable HTTP if upstream returns `405 Method Not Allowed`.
-
-### 4. View All Active Servers and Discovered Tools
-```text
-/mcp_tools
-```
-Displays registered MCP servers, transport type, status, and all exposed tools.
-
-### 5. Remove an MCP Server
-```text
-/remove_mcp name:[str]
-```
+Sit back, grab a coffee, watch Discord's typing indicator pulse for 90 seconds, and marvel at the technological achievement of our generation.
 
 ---
 
-## ⚡ LLM Provider Slash Commands
+## 📜 Philosophy
 
-### 1. Add or Update a Provider
-`/configure_provider` (or alias `/provider_set`):
-
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `profile` | `str` | Profile name (e.g. `openai`, `anthropic`, `gemini`, `freevip`) |
-| `api_format` | `choice` | `litellm` (Auto/Prefix), `openai`, `anthropic`, `gemini`, `openrouter`, `ollama` (also supports `vertex_ai`, `bedrock`, `deepseek`, `groq`, `xai`) |
-| `api_key` | `str` | Provider API key |
-| `base_url` | `str` | Custom endpoint (e.g. `https://api.groq.com/openai/v1`, `https://sharellm.net/v1`, `https://logfare.ai/v1`) |
-| `model` | `str` | Target model name (e.g. `glm-5.3-flash`, `sensenova`, `gemini-2.5-pro`, `claude-3-5-haiku-latest`) |
-| `max_tokens` | `int` | Maximum generation tokens (default: `32768`) |
-
-### 2. Switch Active Provider / Model
-```text
-/switch_provider profile:freevip model:sensenova
-```
-
-### 3. Delete a Provider
-```text
-/delete_provider profile:old_profile
-```
-
-### 4. Change Persona / System Prompt
-```text
-/set_prompt prompt:You are an expert research assistant.
-```
-
-### 5. Check Live Router & MCP Status
-```text
-/llm_status
-```
-Displays the active profile, configured API format, base URL, target model, resolved LiteLLM routing target, and registered MCP server statuses.
+> *"If a Discord bot can be written in a single 30-line script, it simply doesn't have enough layers of abstraction."*
 
 ---
 
-## 🧪 Testing & Verification
-
-The codebase includes an extensive offline regression test suite that uses synthetic configurations, fakes, and mock transports without contacting external APIs or spawning untrusted subprocesses.
-
-### Running Offline Tests
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-All **100 regression and safety tests** pass in ~6.3s across 17 test modules (including `test_litellm_routing.py`).
-
-### Compilation Check
-```powershell
-.\.venv\Scripts\python.exe -m py_compile config_manager.py mcp_manager.py llm_service.py main.py bot.py llm_engine.py tool_policy.py error_reporting.py request_limits.py conversation.py
-```
-Passes with exit code 0.
+*For actual technical documentation and architecture audits, see [README_TECHNICAL.md](README_TECHNICAL.md) and [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md).*
