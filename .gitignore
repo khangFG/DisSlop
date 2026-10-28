@@ -1,0 +1,13 @@
+.env
+runtime_config.json
+__pycache__/
+.venv/
+.codegraph/
+skills-lock.json
+PROJECT_SUMMARY.md
+PROJECT_HANDOFF.md
+.agents
+.gemini
+tests
+tasks
+__pycache__
