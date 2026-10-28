@@ -16,7 +16,7 @@ Have you ever looked at a quiet, peaceful Discord server and thought:
 
 > *"What this chat really needs is a 26-billion-parameter open-weights model reading a 128,000-character Wikipedia article about Soviet tank transmissions for 92 seconds before crashing with a `500 Internal Server Error`?"*
 
-Look no further. **`disslop`** turns what could have been a 15-line `discord.py` bot into an enterprise-grade, asynchronous Model Context Protocol (MCP) orchestrator designed to pump unadulterated AI slop directly into your `#general` channel.
+Look no further. **`DisSlop`** turns what could have been a 15-line `discord.py` bot into an enterprise-grade, asynchronous Model Context Protocol (MCP) orchestrator designed to pump unadulterated AI slop directly into your `#general` channel.
 
 Why write a simple bot when you can build a **multi-process subprocess sandbox with monotonic cooldown algorithms, LiteLLM unified dispatch, and 100 unit tests** just to deliver three paragraphs of hallucinated text?
 
@@ -26,8 +26,6 @@ Why write a simple bot when you can build a **multi-process subprocess sandbox w
 
 * **Artisanal 91.66-Second Suspense Engine**:
   Will it answer? Will it time out? Will the upstream provider melt down? Every `@mention` is an exhilarating, high-stakes game of Russian roulette!
-* **DeepSeek Markup Language (DSML) Scrubbing**:
-  When your budget model gets overwhelmed and starts vomiting raw `< | DSML | tool_calls>` and naked XML tags directly into its answer, our regex sanitizers catch it mid-air so your friends think the robot is actually competent.
 * **Format-Aware Tool Result Compaction**:
   Fetches two Wikipedia articles totaling 250,000 characters, chops them into Head/Middle/Tail samples with surgical precision, and feeds them into an LLM context window that was never meant to hold them.
 * **100% Contract-Tested Slop Delivery**:
@@ -62,8 +60,8 @@ disslop/
 ## 🚀 Quick Slop Setup
 
 ### 1. Requirements
-* **Python 3.14+** (Because why run boring Python 3.11 when you can debug experimental bytecode?)
-* A Discord bot token from the [Developer Portal](https://discord.com/developers/applications) with **Message Content Intent** enabled.
+* **Python 3.14+** 
+* A Discord bot token from the [Developer Portal](https://discord.com/developers/applications) with **Message Content Intent**, or just go YOLO with **Administrators** enabled.
 * An API key from whatever third-party proxy endpoint is currently not returning `502 Bad Gateway`.
 
 ### 2. Spawn Your Virtual Isolation Chamber (`.venv`)
@@ -96,13 +94,12 @@ Copy `.env.example` to `.env`:
 DISCORD_BOT_TOKEN=your_token_here
 ADMIN_USER_ID=your_id_here
 ```
-*(Don't worry, our redaction engine replaces your secrets with `***` faster than you can leak them).*
 
 ### 4. Launch the Slop Machine
 ```powershell
 # Windows
 .\run.bat
-
+# Sorry but this shit only have executable for winslop because the owner is a dumb fuck
 # Or via PowerShell
 .\run.ps1
 ```
@@ -127,7 +124,7 @@ ADMIN_USER_ID=your_id_here
 
 Mention the bot in your server:
 ```text
-@walt fetch https://en.wikipedia.org/wiki/T-54/55 https://en.wikipedia.org/wiki/T-62
+@yourbot fetch https://en.wikipedia.org/wiki/T-62
 ```
 Sit back, grab a coffee, watch Discord's typing indicator pulse for 90 seconds, and marvel at the technological achievement of our generation.
 
