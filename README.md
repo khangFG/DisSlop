@@ -61,7 +61,7 @@ disslop/
 
 ### 1. Requirements
 * **Python 3.14+** 
-* A Discord bot token from the [Developer Portal](https://discord.com/developers/applications) with **Message Content Intent**, or just go YOLO with **Administrators** enabled.
+* A Discord bot token from the [Developer Portal](https://discord.com/developers/applications) with **Message Content Intent**, or just go wild with **Administrators** enabled.
 * An API key from whatever third-party proxy endpoint is currently not returning `502 Bad Gateway`.
 
 ### 2. Spawn Your Virtual Isolation Chamber (`.venv`)
