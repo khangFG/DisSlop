@@ -103,6 +103,7 @@ ADMIN_USER_ID=your_id_here
 # Or via PowerShell
 .\run.ps1
 # Manual run
+.\.venv\Scripts\Activate.ps1
 python bot.py
 ```
 
