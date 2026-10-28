@@ -8,7 +8,6 @@ PROJECT_SUMMARY.md
 PROJECT_HANDOFF.md
 .agents
 .gemini
-tests
 tasks
 __pycache__
 GEMINI.md
