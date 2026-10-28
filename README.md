@@ -77,7 +77,7 @@ python -m venv .venv
 # (If PowerShell complains about execution policies: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass)
 
 # On Windows Command Prompt (cmd.exe):
-.\.venv\Scripts\activate.bat
+.\.venv\Scripts\activate.bat (not really work right now)
 
 # On Linux / macOS (if you somehow escaped Windows):
 source .venv/bin/activate
@@ -102,6 +102,8 @@ ADMIN_USER_ID=your_id_here
 # Sorry but this shit only have executable for winslop because the owner is a dumb fuck
 # Or via PowerShell
 .\run.ps1
+# Manual run
+python bot.py
 ```
 
 ---
